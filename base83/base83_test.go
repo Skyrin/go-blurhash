@@ -6,7 +6,7 @@ import (
 
 	"github.com/matryer/is"
 
-	"github.com/bbrks/go-blurhash/base83"
+	"github.com/Skyrin/go-blurhash/base83"
 )
 
 var tests = []struct {

@@ -8,7 +8,7 @@ import (
 
 	"github.com/matryer/is"
 
-	"github.com/bbrks/go-blurhash"
+	"github.com/Skyrin/go-blurhash"
 )
 
 func TestEncode(t *testing.T) {
