@@ -1,6 +1,7 @@
 package blurhash
 
 import (
+	"errors"
 	"image"
 	"image/color"
 	"math"
@@ -39,7 +40,10 @@ func Encode(xComponents, yComponents int, img image.Image) (hash string, err err
 	for y := 0; y < yComponents; y++ {
 		factors[y] = make([][3]float64, xComponents)
 		for x := 0; x < xComponents; x++ {
-			factor := multiplyBasisFunction(x, y, img)
+			factor, err := multiplyBasisFunction(x, y, img)
+			if err != nil {
+				return "", err
+			}
 			factors[y][x][0] = factor[0]
 			factors[y][x][1] = factor[1]
 			factors[y][x][2] = factor[2]
@@ -111,7 +115,7 @@ func encodeAC(r, g, b, maximumValue float64) int {
 	return int(quantR*19*19 + quantG*19 + quantB)
 }
 
-func multiplyBasisFunction(xComponents, yComponents int, img image.Image) [3]float64 {
+func multiplyBasisFunction(xComponents, yComponents int, img image.Image) (res [3]float64, err error) {
 	var r, g, b float64
 	width, height := float64(img.Bounds().Dx()), float64(img.Bounds().Dy())
 
@@ -125,7 +129,7 @@ func multiplyBasisFunction(xComponents, yComponents int, img image.Image) [3]flo
 			//cR, cG, cB, _ := img.At(x, y).RGBA()
 			c, ok := color.NRGBAModel.Convert(img.At(x, y)).(color.NRGBA)
 			if !ok {
-				panic("not color.NRGBA")
+				return res, errors.New("not color.NRGBA")
 			}
 			basis := math.Cos(math.Pi*float64(xComponents)*float64(x)/width) *
 				math.Cos(math.Pi*float64(yComponents)*float64(y)/height)
@@ -140,5 +144,5 @@ func multiplyBasisFunction(xComponents, yComponents int, img image.Image) [3]flo
 		r * scale,
 		g * scale,
 		b * scale,
-	}
+	}, nil
 }
